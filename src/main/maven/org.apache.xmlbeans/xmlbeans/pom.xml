@@ -28,10 +28,27 @@
     <description>XmlBeans main jar</description>
     <url>https://xmlbeans.apache.org/</url>
 
-    <issueManagement>
-        <system>jira</system>
-        <url>https://issues.apache.org/jira/browse/XMLBEANS</url>
-    </issueManagement>
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>https://www.apache.org/</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>poi</id>
+            <name>POI Team</name>
+            <email>user@poi.apache.org</email>
+            <organization>Apache POI</organization>
+        </developer>
+    </developers>
 
     <mailingLists>
         <mailingList>
@@ -48,33 +65,16 @@
         </mailingList>
     </mailingLists>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
     <scm>
         <connection>scm:git:https://github.com/apache/poi-xmlbeans.git</connection>
         <developerConnection>scm:git:https://github.com/apache/poi-xmlbeans.git</developerConnection>
         <url>https://github.com/apache/poi-xmlbeans</url>
     </scm>
 
-    <organization>
-        <name>XmlBeans</name>
-        <url>https://xmlbeans.apache.org/</url>
-    </organization>
-
-    <developers>
-        <developer>
-            <name>POI Team</name>
-            <id>poi</id>
-            <email>user@poi.apache.org</email>
-            <organization>Apache POI</organization>
-        </developer>
-    </developers>
+    <issueManagement>
+        <system>jira</system>
+        <url>https://issues.apache.org/jira/browse/XMLBEANS</url>
+    </issueManagement>
 
     <dependencyManagement>
         <dependencies>
@@ -92,11 +92,18 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
             <version>12.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.10.17</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -111,17 +118,29 @@
             <version>3.28.2</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun.org.apache.xml.internal</groupId>
+            <artifactId>resolver</artifactId>
+            <version>20050927</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- dependencies for xmlbeans maven plugin -->
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
+            <artifactId>maven-core</artifactId>
             <version>3.9.16</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
+            <version>3.9.16</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
             <version>3.9.16</version>
             <scope>provided</scope>
         </dependency>

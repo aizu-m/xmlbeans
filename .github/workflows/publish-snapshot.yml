@@ -1,0 +1,39 @@
+# Publishes SNAPSHOT builds of trunk to https://repository.apache.org/content/repositories/snapshots/
+
+name: Publish snapshot
+
+on:
+  push:
+    branches: [ trunk ]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  publish:
+    if: github.repository == 'apache/poi-xmlbeans'
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up JDK
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '8'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Publish to Apache Nexus
+      run: |
+        case "$(grep '^XMLBeansVersion=' gradle.properties)" in
+          *-SNAPSHOT) ;;
+          *) echo "not a SNAPSHOT version, skipping"; exit 0 ;;
+        esac
+        ./gradlew publishPOIPublicationToApacheRepository -PjdkVersion=8 --no-daemon
+      env:
+        ORG_GRADLE_PROJECT_apacheUsername: ${{ secrets.NEXUS_STAGE_DEPLOYER_USER }}
+        ORG_GRADLE_PROJECT_apachePassword: ${{ secrets.NEXUS_STAGE_DEPLOYER_PW }}

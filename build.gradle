@@ -32,6 +32,7 @@ plugins {
     id 'java-library'
     id 'idea'
     id 'maven-publish'
+    id 'signing'
     id 'distribution'
     id('org.nosphere.apache.rat') version '0.8.1'
     id('de.thetaphi.forbiddenapis') version '3.10'
@@ -526,11 +527,27 @@ distributions {
     }
 }
 
+// the only dependencies published with compile scope, see the withXml below
+def pomCompileDependencies = ['org.apache.logging.log4j:log4j-api']
+
+boolean isSnapshot = XMLBeansVersion.endsWith('-SNAPSHOT')
+
 publishing {
+    repositories {
+        // credentials come from the apacheUsername / apachePassword Gradle properties,
+        // e.g. ORG_GRADLE_PROJECT_apacheUsername in CI
+        maven {
+            name = 'apache'
+            url = isSnapshot
+                ? 'https://repository.apache.org/content/repositories/snapshots/'
+                : 'https://repository.apache.org/service/local/staging/deploy/maven2/'
+            credentials(PasswordCredentials)
+        }
+    }
     publications {
         POI(MavenPublication) {
             groupId = 'org.apache.xmlbeans'
-            artifactId = project.archivesBaseName
+            artifactId = 'xmlbeans'
             version = XMLBeansVersion
 
             from components.java
@@ -559,10 +576,16 @@ publishing {
 
                 licenses {
                     license {
-                        name = 'Apache License, Version 2.0'
+                        name = 'The Apache Software License, Version 2.0'
                         url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                         distribution = 'repo'
                     }
+                }
+
+                scm {
+                    connection = 'scm:git:https://github.com/apache/poi-xmlbeans.git'
+                    developerConnection = 'scm:git:https://github.com/apache/poi-xmlbeans.git'
+                    url = 'https://github.com/apache/poi-xmlbeans'
                 }
 
                 organization {
@@ -584,12 +607,25 @@ publishing {
                     }
                 }
 
+                // Gradle maps 'implementation' to runtime scope. Match the POMs of earlier
+                // releases instead: log4j-api is the only dependency users get transitively,
+                // everything else (Saxon, javaparser, ant, the maven plugin APIs) is provided.
+                withXml {
+                    asNode().dependencies.dependency.each { dep ->
+                        String ga = "${dep.groupId.text()}:${dep.artifactId.text()}"
+                        String scope = (ga in pomCompileDependencies) ? 'compile' : 'provided'
+                        if (dep.scope) {
+                            dep.scope[0].value = scope
+                        } else {
+                            dep.appendNode('scope', scope)
+                        }
+                    }
+                }
+
                 withXml {
                     def r = asElement()
                     def doc = r.getOwnerDocument()
-                    def hdr = new File('../legal/HEADER')
-                    if (!hdr.exists()) hdr = new File('legal/HEADER')
-                    def asl = doc.createComment(hdr.text)
+                    def asl = doc.createComment(rootProject.file('legal/HEADER').text)
                     // adding ASF header before root node is ignored
                     // doc.insertBefore(asl, doc.getDocumentElement())
                     r.insertBefore(asl, r.getFirstChild())
@@ -599,7 +635,16 @@ publishing {
     }
 }
 
-generatePomFileForPOIPublication.destination = "build/dist/maven/${project.archivesBaseName}-${XMLBeansVersion}.pom"
+generatePomFileForPOIPublication.destination = "build/dist/maven/xmlbeans-${XMLBeansVersion}.pom"
+
+// release artifacts are signed with the release manager's key via the local gpg,
+// snapshots are published unsigned
+if (!isSnapshot) {
+    signing {
+        useGpgCmd()
+        sign publishing.publications.POI
+    }
+}
 
 [binDistTar, binDistZip]*.dependsOn 'jar'
 [binDistTar, binDistZip]*.dependsOn 'export4anttest'
