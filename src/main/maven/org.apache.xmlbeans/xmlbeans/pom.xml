@@ -57,9 +57,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:https://svn.apache.org/repos/asf/xmlbeans/</connection>
-        <developerConnection>scm:svn:https://${maven.username}@svn.apache.org/repos/asf/xmlbeans/</developerConnection>
-        <url>https://svn.apache.org/repos/asf/xmlbeans/</url>
+        <connection>scm:git:https://github.com/apache/poi-xmlbeans.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/poi-xmlbeans.git</developerConnection>
+        <url>https://github.com/apache/poi-xmlbeans</url>
     </scm>
 
     <organization>

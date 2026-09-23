@@ -232,6 +232,6 @@ Your Name
 Note, announcements should be sent from your @apache.org e-mail address.
 
 9. Add the version to the DOAP file too
-  https://svn.apache.org/repos/asf/xmlbeans/trunk/xkit/doap_XMLBeans.rdf
+  https://github.com/apache/poi-xmlbeans/blob/trunk/xkit/doap_XMLBeans.rdf
 
 11. Delete directory that held RC, if any.

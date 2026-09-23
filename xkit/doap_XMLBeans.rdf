@@ -228,10 +228,10 @@ limitations under the License.
             </Version>
         </release>
         <repository>
-            <SVNRepository>
-                <location rdf:resource="http://svn.apache.org/repos/asf/xmlbeans/trunk/"/>
-                <browse rdf:resource="http://svn.apache.org/viewcvs.cgi/xmlbeans/trunk/"/>
-            </SVNRepository>
+            <GitRepository>
+                <location rdf:resource="https://github.com/apache/poi-xmlbeans.git"/>
+                <browse rdf:resource="https://github.com/apache/poi-xmlbeans"/>
+            </GitRepository>
         </repository>
         <maintainer>
             <foaf:Person>
