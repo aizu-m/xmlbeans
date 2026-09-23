@@ -96,6 +96,27 @@ limitations under the License.
         <category rdf:resource="https://projects.apache.org/category/xml"/>
         <release>
             <Version>
+                <name>XMLBeans v5.4.1</name>
+                <created>2026-09-23</created>
+                <revision>5.4.1</revision>
+            </Version>
+        </release>
+        <release>
+            <Version>
+                <name>XMLBeans v5.4.0</name>
+                <created>2026-08-24</created>
+                <revision>5.4.0</revision>
+            </Version>
+        </release>
+        <release>
+            <Version>
+                <name>XMLBeans v5.3.0</name>
+                <created>2024-12-13</created>
+                <revision>5.3.0</revision>
+            </Version>
+        </release>
+        <release>
+            <Version>
                 <name>XMLBeans v5.2.2</name>
                 <created>2024-11-05</created>
                 <revision>5.2.2</revision>
@@ -103,7 +124,7 @@ limitations under the License.
         </release>
         <release>
             <Version>
-				<name>XMLBeans v5.2.1</name>
+                <name>XMLBeans v5.2.1</name>
                 <created>2024-05-27</created>
                 <revision>5.2.1</revision>
             </Version>
@@ -111,7 +132,7 @@ limitations under the License.
         <release>
             <Version>
                 <name>XMLBeans v5.2.0</name>
-                <created>2023-11-17</created>
+                <created>2023-11-16</created>
                 <revision>5.2.0</revision>
             </Version>
         </release>
@@ -167,7 +188,7 @@ limitations under the License.
         <release>
             <Version>
                 <name>XMLBeans v3.1.0</name>
-                <created>2019-03-22</created>
+                <created>2019-03-26</created>
                 <revision>3.1.0</revision>
             </Version>
         </release>
@@ -201,6 +222,20 @@ limitations under the License.
         </release>
         <release>
             <Version>
+                <name>XMLBeans v2.5.0</name>
+                <created>2009-12-14</created>
+                <revision>2.5.0</revision>
+            </Version>
+        </release>
+        <release>
+            <Version>
+                <name>XMLBeans v2.4.0</name>
+                <created>2008-07-08</created>
+                <revision>2.4.0</revision>
+            </Version>
+        </release>
+        <release>
+            <Version>
                 <name>XMLBeans v2.1.0</name>
                 <created>2005-11-16</created>
                 <revision>2.1.0</revision>
@@ -228,10 +263,10 @@ limitations under the License.
             </Version>
         </release>
         <repository>
-            <SVNRepository>
-                <location rdf:resource="http://svn.apache.org/repos/asf/xmlbeans/trunk/"/>
-                <browse rdf:resource="http://svn.apache.org/viewcvs.cgi/xmlbeans/trunk/"/>
-            </SVNRepository>
+            <GitRepository>
+                <location rdf:resource="https://github.com/apache/poi-xmlbeans.git"/>
+                <browse rdf:resource="https://github.com/apache/poi-xmlbeans"/>
+            </GitRepository>
         </repository>
         <maintainer>
             <foaf:Person>
