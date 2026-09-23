@@ -9,6 +9,11 @@ on:
 
 permissions: {}
 
+# only one snapshot publish at a time; a newer push cancels the one in flight
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   publish:
     if: github.repository == 'apache/poi-xmlbeans'

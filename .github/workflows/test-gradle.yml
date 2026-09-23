@@ -11,6 +11,11 @@ on:
 
 permissions: {}
 
+# one build per PR (or branch); a new push to a PR cancels its build in flight
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
 
