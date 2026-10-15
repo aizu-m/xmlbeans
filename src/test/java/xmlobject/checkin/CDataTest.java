@@ -16,11 +16,13 @@
 package xmlobject.checkin;
 
 import org.apache.xmlbeans.SystemProperties;
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -65,5 +67,24 @@ public class CDataTest {
         opts.setSavePrettyPrint();
         String result2 = xo.xmlText(opts);
         assertEquals(expected2.replace("NL", NL), result2, "prettyPrint");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2})
+    void badCharInCData(int pos) throws XmlException {
+        // enough '<' to make the saver pick a CDATA section
+        StringBuilder text = new StringBuilder("ab<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        text.setCharAt(pos, '\u0001');
+
+        XmlObject xo = XmlObject.Factory.newInstance();
+        try (XmlCursor c = xo.newCursor()) {
+            c.toNextToken();
+            c.insertElementWithText("a", text.toString());
+        }
+
+        String saved = xo.xmlText();
+        text.setCharAt(pos, '?');
+        assertEquals("<a><![CDATA[" + text + "]]></a>", saved);
+        XmlObject.Factory.parse(saved);
     }
 }

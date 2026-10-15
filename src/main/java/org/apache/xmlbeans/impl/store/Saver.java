@@ -1299,19 +1299,18 @@ abstract class Saver {
             // Heuristic for knowing when to save out stuff as a CDATA.
             //
             if (forceCData || (_lastEmitCch > _cdataLengthThreshold && count > _cdataEntityCountThreshold)) {
-                boolean lastWasBracket = _cbuf[i] == ']';
+                char first = _cbuf[i];
 
-                i = replace(i, "<![CDATA[" + _cbuf[i]);
+                i = replace(i, "<![CDATA[" + (isBadChar(first) ? '?' : first));
 
-                boolean secondToLastWasBracket = lastWasBracket;
+                boolean secondToLastWasBracket = false;
+                boolean lastWasBracket = first == ']';
 
-                lastWasBracket = _cbuf[i] == ']';
-
-                if (++i == _cbuf.length) {
+                if (i == _cbuf.length) {
                     i = 0;
                 }
 
-                for (int cch = _lastEmitCch - 2; cch > 0; cch--) {
+                for (int cch = _lastEmitCch - 1; cch > 0; cch--) {
                     char ch = _cbuf[i];
 
                     if (ch == '>' && secondToLastWasBracket && lastWasBracket) {
