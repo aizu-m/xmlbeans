@@ -119,7 +119,7 @@ public class JavaQNameHolder extends XmlObjectBase {
             localname = v.substring(start, end);
         }
 
-        if (prefix.length() > 0 && !XMLChar.isValidNCName(prefix)) {
+        if (firstcolon >= 0 && !XMLChar.isValidNCName(prefix)) {
             throw new XmlValueOutOfRangeException(XmlErrorCodes.QNAME, new Object[]{"Prefix not a valid NCName in '" + v + "'"});
         }
 
