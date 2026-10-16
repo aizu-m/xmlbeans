@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -58,7 +57,8 @@ public class XsiTypeBlockValidateTest {
     }
 
     @Test
-    void unionMemberSubstitutionUnderTypeBlock() throws Exception {
+    void simpleTypeSubstitutionForUnionContentComplexType() throws Exception {
+        // ct only has union simple content; xs:int is a simple type and not derived from ct
         String xsd =
             "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema' " +
             "xmlns:t='urn:t' targetNamespace='urn:t'>" +
@@ -70,7 +70,10 @@ public class XsiTypeBlockValidateTest {
             "</xs:schema>";
 
         XmlObject doc = parse(xsd, UNION_MEMBER_INSTANCE);
-        assertDoesNotThrow(() -> doc.validate(new XmlOptions().setErrorListener(new ArrayList<>())));
+        List<XmlError> errors = new ArrayList<>();
+        assertFalse(doc.validate(new XmlOptions().setErrorListener(errors)));
+        assertEquals(1, errors.size(), errors.toString());
+        assertEquals("cvc-elt.4.3a", errors.get(0).getErrorCode());
     }
 
     @Test

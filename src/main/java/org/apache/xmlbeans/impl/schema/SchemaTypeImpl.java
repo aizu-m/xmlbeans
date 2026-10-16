@@ -2177,7 +2177,9 @@ public final class SchemaTypeImpl implements SchemaType, TypeStoreUserFactory {
             return false;
         }
 
-        if (getSimpleVariety() == UNION) {
+        // a union admits types derived from its members (Type Derivation OK (Simple) 2.2.4), but a
+        // complex type with union simple content is not a union and admits no simple type
+        if (isSimpleType() && getSimpleVariety() == UNION) {
             SchemaType[] members = getUnionMemberTypes();
             for (SchemaType member : members) {
                 if (member.isAssignableFrom(type)) {
