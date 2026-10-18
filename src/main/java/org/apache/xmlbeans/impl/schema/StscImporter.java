@@ -246,10 +246,12 @@ public class StscImporter {
                 int slashDotDotIndex = r.indexOf("/..", exclPointSlashIndex);
                 while (slashDotDotIndex > 0) {
                     int prevSlashIndex = r.lastIndexOf("/", slashDotDotIndex - 1);
-                    if (prevSlashIndex >= exclPointSlashIndex) {
-                        String temp = r.substring(slashDotDotIndex + 3);
-                        r = r.substring(0, prevSlashIndex).concat(temp);
+                    if (prevSlashIndex < exclPointSlashIndex) {
+                        // ".." above the root of the jar, leave it unresolved
+                        break;
                     }
+                    String temp = r.substring(slashDotDotIndex + 3);
+                    r = r.substring(0, prevSlashIndex).concat(temp);
                     slashDotDotIndex = r.indexOf("/..", exclPointSlashIndex);
                 }
             }
