@@ -189,6 +189,7 @@ public class ValidatingXMLStreamReader
                 case XMLEvent.SPACE:
                     if (super.hasText())
                         _buffer.append(super.getText());
+                    // fall through
 
                 case XMLEvent.COMMENT:
                 case XMLEvent.PROCESSING_INSTRUCTION:

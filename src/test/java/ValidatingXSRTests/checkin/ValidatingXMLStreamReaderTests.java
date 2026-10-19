@@ -35,7 +35,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -420,5 +422,49 @@ public class ValidatingXMLStreamReaderTests {
         assertFalse(valXsr.isValid(), "Text split by a pi was validated in pieces: " + doc);
         assertEquals(1, errors.size(), errors.toString());
         assertEquals("cvc-maxInclusive-valid", errors.iterator().next().getErrorCode());
+    }
+
+    @Test
+    void testEventsSeenAroundProcessingInstruction() throws Exception {
+        // the reader passes events through to its caller, so packing text also
+        // decides what the caller sees: a comment or pi after text is consumed
+        // into the merged CHARACTERS event, one before any text is passed on
+        String xsd =
+            "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema' targetNamespace='urn:t'>" +
+            "  <xs:element name='v' type='xs:string'/>" +
+            "</xs:schema>";
+        SchemaTypeLoader stl = XmlBeans.loadXsd(new XmlObject[]{SchemaDocument.Factory.parse(xsd)});
+        String doc = "<v xmlns='urn:t'><?lead x?>a<?pi x?><!--c-->b<?tail x?></v>";
+
+        XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(doc));
+        Collection<XmlError> errors = new ArrayList<>();
+
+        ValidatingXMLStreamReader valXsr = new ValidatingXMLStreamReader();
+        valXsr.init(xsr, false, null, stl, null, errors);
+
+        List<String> events = new ArrayList<>();
+        while (valXsr.hasNext()) {
+            int evType = valXsr.next();
+            switch (evType) {
+                case XMLEvent.START_ELEMENT:
+                    events.add("start " + valXsr.getLocalName());
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    events.add("end " + valXsr.getLocalName());
+                    break;
+                case XMLEvent.PROCESSING_INSTRUCTION:
+                    events.add("pi " + valXsr.getPITarget());
+                    break;
+                case XMLEvent.CHARACTERS:
+                    events.add("text " + valXsr.getText());
+                    break;
+                default:
+                    events.add("event " + evType);
+            }
+        }
+
+        assertEquals(Arrays.asList("start v", "pi lead", "text ab", "end v", "event " + XMLEvent.END_DOCUMENT),
+            events);
+        assertTrue(valXsr.isValid(), errors.toString());
     }
 }
