@@ -16,6 +16,7 @@ package ValidatingXSRTests.checkin;
 
 import org.apache.xmlbeans.*;
 import org.apache.xmlbeans.impl.validator.ValidatingXMLStreamReader;
+import org.apache.xmlbeans.impl.xb.xsdschema.SchemaDocument;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -25,15 +26,19 @@ import tools.util.JarUtil;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ValidatingXMLStreamReaderTests {
@@ -382,5 +387,38 @@ public class ValidatingXMLStreamReaderTests {
         }
 
         assertTrue(valXsr.isValid(), "Content2 validation is broken.");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "<count xmlns='urn:t'>5<?pi x?>5</count>",
+        "<count xmlns='urn:t'>5<?pi x?><!--c-->5</count>",
+        "<count xmlns='urn:t'>5<!--c-->5</count>"
+    })
+    void testTextSplitByProcessingInstruction(String doc) throws Exception {
+        // a comment or pi between two text chunks contributes no character data,
+        // so the element value is 55 and must fail maxInclusive=9; the validator
+        // only checks the first TEXT event, so the chunks have to arrive as one
+        String xsd =
+            "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema' targetNamespace='urn:t'>" +
+            "  <xs:element name='count'>" +
+            "    <xs:simpleType><xs:restriction base='xs:int'><xs:maxInclusive value='9'/></xs:restriction></xs:simpleType>" +
+            "  </xs:element>" +
+            "</xs:schema>";
+        SchemaTypeLoader stl = XmlBeans.loadXsd(new XmlObject[]{SchemaDocument.Factory.parse(xsd)});
+
+        XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(doc));
+        Collection<XmlError> errors = new ArrayList<>();
+
+        ValidatingXMLStreamReader valXsr = new ValidatingXMLStreamReader();
+        valXsr.init(xsr, false, null, stl, null, errors);
+
+        while (valXsr.hasNext()) {
+            valXsr.next();
+        }
+
+        assertFalse(valXsr.isValid(), "Text split by a pi was validated in pieces: " + doc);
+        assertEquals(1, errors.size(), errors.toString());
+        assertEquals("cvc-maxInclusive-valid", errors.iterator().next().getErrorCode());
     }
 }
