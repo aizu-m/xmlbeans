@@ -189,9 +189,13 @@ public class ValidatingXMLStreamReader
                 case XMLEvent.SPACE:
                     if (super.hasText())
                         _buffer.append(super.getText());
+                    // fall through
 
                 case XMLEvent.COMMENT:
-                    //ignore
+                case XMLEvent.PROCESSING_INSTRUCTION:
+                    // neither contributes character data, so text on both
+                    // sides of it is one value - same as the Cur.COMMENT /
+                    // Cur.PROCINST handling in the store's Validate
                     continue;
                 default:
                     return;
