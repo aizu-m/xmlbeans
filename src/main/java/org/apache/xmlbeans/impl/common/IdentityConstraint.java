@@ -17,6 +17,7 @@ package org.apache.xmlbeans.impl.common;
 
 import org.apache.xmlbeans.*;
 import org.apache.xmlbeans.impl.common.ValidatorListener.Event;
+import org.apache.xmlbeans.impl.values.NamespaceContext;
 import org.apache.xmlbeans.impl.xpath.XPath;
 import org.apache.xmlbeans.impl.xpath.XPathExecutionContext;
 
@@ -195,6 +196,16 @@ public class IdentityConstraint {
 
             // Ignore these exceptions. Assume that validation will catch them.
             return null;
+        }
+    }
+
+    private static XmlObject newValue(SchemaType st, String value, Event event) {
+        // QName and NOTATION values need the in-scope namespaces of the instance
+        NamespaceContext.push(new NamespaceContext(event));
+        try {
+            return newValue(st, value);
+        } finally {
+            NamespaceContext.pop();
         }
     }
 
@@ -430,7 +441,7 @@ public class IdentityConstraint {
 
             for (int i = 0; i < _contexts.length; i++) {
                 if (_contexts[i].attr(name)) {
-                    XmlObject o = newValue(st, value);
+                    XmlObject o = newValue(st, value, e);
 
                     // Ignore invalid values. Assume that validation catches these
                     if (o == null) {
@@ -467,7 +478,7 @@ public class IdentityConstraint {
                     }
 
                     SchemaType simpleType = getSimpleType(st);
-                    XmlObject o = newValue(simpleType, value);
+                    XmlObject o = newValue(simpleType, value, e);
 
                     // Ignore invalid values. Assume that validation catches these
                     if (o == null) {
